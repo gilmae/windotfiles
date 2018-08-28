@@ -42,6 +42,13 @@
     uncommit = reset --soft HEAD^
 	# Undo Merge
     undomerge = reset --hard HEAD~1^
+	
+	# Get the current branch name
+	branch-name = "!git rev-parse --abbrev-ref HEAD"
+	
+	# Push the current branch to the remote "origin", and set it to track
+	# the upstream branch
+	publish = "!git push -u origin $(git branch-name)"
 
 [apply]
     # Detect whitespace errors when applying a patch
@@ -61,6 +68,7 @@
     # Speed up commands involving untracked files such as `git status`.
     # https://git-scm.com/docs/git-update-index#_untracked_cache
     untrackedCache = true
+	editor = 'C:/Program Files/Notepad++/notepad++.exe'
 
 [color]
     # Use colors in Git commands that are capable of colored output when
