@@ -28,10 +28,6 @@ function get-session-token{
 		exit
 	}
 
-	$defaultEnvironment = if($Env:AwsEnvironment -eq '') {'default'}else{$Env:AwsEnvironment}
-	$theProfile = if(($result = Read-Host -Prompt "Profile: [$defaultEnvironment]") -eq ''){$defaultEnvironment}else{$result}
-	
-
 	$name = Read-Host -Prompt 'Name'
 	$token = Read-Host -Prompt 'MFA Token'
 	$command = "aws --profile m4uinflogin sts get-session-token --duration 129600 --serial-number arn:aws:iam::183839469016:mfa/$name --token-code $token"
