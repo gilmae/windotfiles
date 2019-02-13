@@ -12,6 +12,7 @@ function vs17 {  & 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Communit
 function e {  & 'notepad++.exe' $args }
 
 Import-Module posh-git
+Set-Alias ~ $HOME
 
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
