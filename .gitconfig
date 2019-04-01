@@ -72,8 +72,6 @@
 	dloc = diff --shortstat
 	
 	url = "!git remote get-url"
-	open-pr = "!start \"$(git url origin)/pullrequestcreate?sourceRef=$(git branch-name)\""
-	
 
 [apply]
     # Detect whitespace errors when applying a patch

@@ -11,20 +11,20 @@ function minutes-from-now-cron($minutes) {
 }
 
 function open($str) {
-	Start-Process $str
+    Start-Process $str
 }
 
 function execute($str) {
-	iex($str)
+    Invoke-Expression($str)
 }
 
 # Sudo
 function sudo() {
     if ($args.Length -eq 1) {
-        start-process $args[0] -verb "runAs"
+        Start-Process $args[0] -verb "runAs"
     }
     if ($args.Length -gt 1) {
-        start-process $args[0] -ArgumentList $args[1..$args.Length] -verb "runAs"
+        Start-Process $args[0] -ArgumentList $args[1..$args.Length] -verb "runAs"
     }
 }
 
@@ -41,7 +41,7 @@ function System-Update() {
 
 # Reload the Shell
 function Reload-Powershell {
-    $newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";
+    $newProcess = New-Object System.Diagnostics.ProcessStartInfo "PowerShell";
     $newProcess.Arguments = "-nologo";
     [System.Diagnostics.Process]::Start($newProcess);
     exit
@@ -49,25 +49,25 @@ function Reload-Powershell {
 
 # Download a file into a temporary folder
 function curlex($url) {
-    $uri = new-object system.uri $url
+    $uri = New-Object system.uri $url
     $filename = $name = $uri.segments | Select-Object -Last 1
-    $path = join-path $env:Temp $filename
-    if( test-path $path ) { rm -force $path }
+    $path = Join-Path $env:Temp $filename
+    if ( Test-Path $path ) { Remove-Item -force $path }
 
-    (new-object net.webclient).DownloadFile($url, $path)
+    (New-Object net.webclient).DownloadFile($url, $path)
 
-    return new-object io.fileinfo $path
+    return New-Object io.fileinfo $path
 }
 
 # Empty the Recycle Bin on all drives
 function Empty-RecycleBin {
     $RecBin = (New-Object -ComObject Shell.Application).Namespace(0xA)
-    $RecBin.Items() | %{Remove-Item $_.Path -Recurse -Confirm:$false}
+    $RecBin.Items() | ForEach-Object { Remove-Item $_.Path -Recurse -Confirm:$false }
 }
 
 # Sound Volume
 function Get-SoundVolume { [math]::Round([Audio]::Volume * 100) }
-function Set-SoundVolume([Parameter(mandatory=$true)][Int32] $Volume) { [Audio]::Volume = ($Volume / 100) }
+function Set-SoundVolume([Parameter(mandatory = $true)][Int32] $Volume) { [Audio]::Volume = ($Volume / 100) }
 function Set-SoundMute { [Audio]::Mute = $true }
 function Set-SoundUnmute { [Audio]::Mute = $false }
 
@@ -75,15 +75,15 @@ function Set-SoundUnmute { [Audio]::Mute = $false }
 ### File System functions
 ### ----------------------------
 # Create a new directory and enter it
-function CreateAndSet-Directory([String] $path) { New-Item $path -ItemType Directory -ErrorAction SilentlyContinue; Set-Location $path}
+function CreateAndSet-Directory([String] $path) { New-Item $path -ItemType Directory -ErrorAction SilentlyContinue; Set-Location $path }
 
 # Determine size of a file or total size of a directory
-function Get-DiskUsage([string] $path=(Get-Location).Path) {
+function Get-DiskUsage([string] $path = (Get-Location).Path) {
     Convert-ToDiskSize `
-        ( `
+    ( `
             Get-ChildItem .\ -recurse -ErrorAction SilentlyContinue `
-            | Measure-Object -property length -sum -ErrorAction SilentlyContinue
-        ).Sum `
+        | Measure-Object -property length -sum -ErrorAction SilentlyContinue
+    ).Sum `
         1
 }
 
@@ -98,18 +98,18 @@ function Clean-Disks {
 # Reload the $env object from the registry
 function Refresh-Environment {
     $locations = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment',
-                 'HKCU:\Environment'
+    'HKCU:\Environment'
 
     $locations | ForEach-Object {
         $k = Get-Item $_
         $k.GetValueNames() | ForEach-Object {
-            $name  = $_
+            $name = $_
             $value = $k.GetValue($_)
             Set-Item -Path Env:\$name -Value $value
         }
     }
 
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
 }
 
 # Set a permanent Environment variable, and reload it into $env
@@ -132,9 +132,9 @@ function Append-EnvPathIfExists([String]$path) { if (Test-Path $path) { Append-E
 
 # Convert a number to a disk size (12.4K or 5M)
 function Convert-ToDiskSize {
-    param ( $bytes, $precision='0' )
-    foreach ($size in ("B","K","M","G","T")) {
-        if (($bytes -lt 1000) -or ($size -eq "T")){
+    param ( $bytes, $precision = '0' )
+    foreach ($size in ("B", "K", "M", "G", "T")) {
+        if (($bytes -lt 1000) -or ($size -eq "T")) {
             $bytes = ($bytes).tostring("F0" + "$precision")
             return "${bytes}${size}"
         }
@@ -155,7 +155,8 @@ function Start-IISExpress {
         if ($iisExpress -eq $null) { $iisExpress = Get-Item "${env:ProgramFiles(x86)}\IIS Express\iisexpress.exe" }
 
         & $iisExpress @("/path:${path}") /port:$port
-    } else { Write-Warning "Unable to find iisexpress.exe"}
+    }
+    else { Write-Warning "Unable to find iisexpress.exe" }
 }
 
 # Extract a .zip file
@@ -199,7 +200,7 @@ function Unzip-File {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$File,
 
         [ValidateNotNullOrEmpty()]
@@ -210,27 +211,30 @@ function Unzip-File {
     $destinationPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Destination)
 
     if (($PSVersionTable.PSVersion.Major -ge 3) -and
-       ((Get-ItemProperty -Path "HKLM:\Software\Microsoft\NET Framework Setup\NDP\v4\Full" -ErrorAction SilentlyContinue).Version -like "4.5*" -or
-       (Get-ItemProperty -Path "HKLM:\Software\Microsoft\NET Framework Setup\NDP\v4\Client" -ErrorAction SilentlyContinue).Version -like "4.5*")) {
+        ((Get-ItemProperty -Path "HKLM:\Software\Microsoft\NET Framework Setup\NDP\v4\Full" -ErrorAction SilentlyContinue).Version -like "4.5*" -or
+            (Get-ItemProperty -Path "HKLM:\Software\Microsoft\NET Framework Setup\NDP\v4\Client" -ErrorAction SilentlyContinue).Version -like "4.5*")) {
 
         try {
             [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
             [System.IO.Compression.ZipFile]::ExtractToDirectory("$filePath", "$destinationPath")
-        } catch {
+        }
+        catch {
             Write-Warning -Message "Unexpected Error. Error details: $_.Exception.Message"
         }
-    } else {
+    }
+    else {
         try {
             $shell = New-Object -ComObject Shell.Application
             $shell.Namespace($destinationPath).copyhere(($shell.NameSpace($filePath)).items())
-        } catch {
+        }
+        catch {
             Write-Warning -Message "Unexpected Error. Error details: $_.Exception.Message"
         }
     }
 }
 
 function Install-Dependencies {
- <#
+    <#
     .SYNOPSIS
        Installs Module dependencies.
 
@@ -255,7 +259,7 @@ function Install-Dependencies {
 
     )
 
-    $modules = Get-Content $path | Select-String -Pattern "#requires -Modules?\s(.*)" | % {$_.matches.groups[1]} | % {$_.ToString().split(',')}
+    $modules = Get-Content $path | Select-String -Pattern "#requires -Modules?\s(.*)" | ForEach-Object { $_.matches.groups[1] } | ForEach-Object { $_.ToString().split(',') }
 
     foreach ($module in $modules) {
         $cmd = "Install-Module"
@@ -279,3 +283,22 @@ function Install-Dependencies {
     }
 }
 
+function Open-Pr {
+    [CmdletBinding()]
+    Param( 
+        [string]$remote = "origin"
+    )  
+
+    $origin = Invoke-Expression("git url $remote") 
+    $branch = Invoke-Expression("git rev-parse --abbrev-ref HEAD") 
+
+    if ($origin.IndexOf("visualstudio.com") -gt -1) {
+        Start-Process "$origin/pullrequestcreate?sourceRef=$branch"
+    }
+    elseif ($origin.IndexOf("github.com" -gt -1)) {
+        Start-Process "$origin/compare/$branch)"
+    }
+    elseif ($origin.IndexOf("bitbucket") -gt -1) {
+        Start-Process "$origin/pull-requests/new?source=$branch"
+    }
+}
