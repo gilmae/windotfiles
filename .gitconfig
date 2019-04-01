@@ -72,7 +72,7 @@
 	dloc = diff --shortstat
 	
 	url = "!git remote get-url"
-	open-pr = "!start \"$(git url origin)/pull-requests/new?source=$(git branch-name)\""
+	open-pr = "!start \"$(git url origin)/pullrequestcreate?sourceRef=$(git branch-name)\""
 	
 
 [apply]
@@ -142,14 +142,11 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
-[user]
-	name = David Edgar
-	email = david.edgar@messagemedia.com.au
-[mergetool "kdiff3"]
-	path = C:/Program Files/KDiff3/kdiff3.exe
-	trustExitCode = false
+
 [diff]
-	guitool = kdiff3
-[difftool "kdiff3"]
-	path = C:/Program Files/KDiff3/kdiff3.exe
-	trustExitCode = false
+    tool = vscode
+[difftool]
+    prompt = false
+[difftool "vscode"]
+    cmd = \"C:\\Users\\david.edgar\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\code.cmd\" \"$LOCAL\" \"$REMOTE\" --diff --wait
+    trustExitCode = false

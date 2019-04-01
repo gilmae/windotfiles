@@ -228,3 +228,54 @@ function Unzip-File {
         }
     }
 }
+
+function Install-Dependencies {
+ <#
+    .SYNOPSIS
+       Installs Module dependencies.
+
+    .DESCRIPTION
+       Inspects a file for module dependencies declarations (#requires -Modules), parses the declarations and installs the modules
+
+    .PARAMETER Path
+        The file to scan for dependency declarations
+
+    .EXAMPLE
+       Install-Dependencies 'script.ps1'
+
+    .OUTPUTS
+       None
+
+    .NOTES
+       Inspired by:  bundle install, npm install, but using the built-in syntax for dependency declaration
+    #>
+    [CmdletBinding()]
+    param (
+        [String] $path = (Get-Location).Path
+
+    )
+
+    $modules = Get-Content $path | Select-String -Pattern "#requires -Modules?\s(.*)" | % {$_.matches.groups[1]} | % {$_.ToString().split(',')}
+
+    foreach ($module in $modules) {
+        $cmd = "Install-Module"
+        if ($module.IndexOf("@") -eq 0) {
+            $h = Invoke-Expression($module)
+            $cmd = "$cmd $($h.ModuleName)"
+            if ($h.ContainsKey("ModuleVersion")) {
+                $cmd = "$cmd -MinimumVersion $($h.ModuleVersion)"
+            }
+            elseif ($h.ContainsKey("RequiredVersion")) {
+                $cmd = "$cmd -RequiredVersion $($h.RequiredVersion)"
+            }
+        }
+        else {
+            $cmd = "$cmd $module"
+        }
+
+        Invoke-Expression $cmd
+    }   if ($AcceptLicense) {
+        $cmd = "$cmd -AcceptLicense"
+    }
+}
+

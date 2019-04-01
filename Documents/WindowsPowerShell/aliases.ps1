@@ -13,6 +13,15 @@ ${function:dt} = { Set-Location ~\Desktop }
 ${function:docs} = { Set-Location ~\Documents }
 ${function:dl} = { Set-Location ~\Downloads }
 
+${function:gs} = { iex "git status" }
+${function:proj} = { 
+    Set-Location c:\projects 
+    if ($args.length -gt 0){
+        Set-Location $args[0]
+    }
+}
+function e {  & 'C:\Program Files (x86)\Notepad++\notepad++.exe' $args }
+
 # Missing Bash aliases
 Set-Alias time Measure-Command
 
@@ -76,3 +85,6 @@ Set-Alias update System-Update
 
 # Set GVim as default vim
 Set-Alias vim gvim
+
+
+
