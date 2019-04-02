@@ -1,5 +1,8 @@
 # Basic commands
 function which($name) { Get-Command $name -ErrorAction SilentlyContinue | Select-Object Definition }
+
+function path($name) { Get-Command $name -ErrorAction SilentlyContinue | Split-Path  }
+
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
 # Common Editing needs
@@ -20,8 +23,16 @@ function execute($str) {
 
 # Sudo
 function sudo() {
+    
     if ($args.Length -eq 1) {
-        Start-Process $args[0] -verb "runAs"
+        if ($args[0] = "!!") {
+            $cmd =  $(Get-History -Count 1).CommandLine
+            
+        } else {
+            $cmd = $args[0]
+        }
+        Write-Host $cmd
+        Start-Process $cmd -verb "runAs"
     }
     if ($args.Length -gt 1) {
         Start-Process $args[0] -ArgumentList $args[1..$args.Length] -verb "runAs"
@@ -33,10 +44,10 @@ function System-Update() {
     Install-WindowsUpdate -IgnoreUserInput -IgnoreReboot -AcceptAll
     Update-Module
     Update-Help -Force
-    gem update --system
-    gem update
-    npm install npm -g
-    npm update -g
+    #gem update --system
+    #gem update
+    #npm install npm -g
+    #npm update -g
 }
 
 # Reload the Shell
@@ -278,8 +289,6 @@ function Install-Dependencies {
         }
 
         Invoke-Expression $cmd
-    }   if ($AcceptLicense) {
-        $cmd = "$cmd -AcceptLicense"
     }
 }
 
