@@ -72,7 +72,6 @@
 	dloc = diff --shortstat
 	
 	url = "!git remote get-url"
-
 [apply]
     # Detect whitespace errors when applying a patch
     whitespace = warn
@@ -93,6 +92,8 @@
     untrackedCache = true
 	editor = 'C:/Program Files/Notepad++/notepad++.exe'
 
+	preloadindex = true
+	fscache = true
 [color]
     # Use colors in Git commands that are capable of colored output when
     # outputting to the terminal. (This is the default setting in Git ≥ 1.8.4.)
@@ -148,3 +149,5 @@
 [difftool "vscode"]
     cmd = \"C:\\Users\\david.edgar\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\code.cmd\" \"$LOCAL\" \"$REMOTE\" --diff --wait
     trustExitCode = false
+[gc]
+	auto = 256
