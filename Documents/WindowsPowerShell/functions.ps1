@@ -311,3 +311,33 @@ function Open-Pr {
         Start-Process "$origin/pull-requests/new?source=$branch"
     }
 }
+
+function Find-Git-Dir {
+    $p = $pwd
+    while ($p -ne $Null) {
+      if (Join-Path -Path $p -ChildPath ".git" | Test-Path ) {
+          return $p
+      }
+      $p = (get-item $p).parent.FullName
+    }
+  }
+  
+  function Get-Current-Branch {
+    Find-Git-Dir | Join-Path -ChildPath ".git\logs\HEAD" | gci | Get-Content | Select-String -Pattern "checkout: moving from .+ to (.+)" | % {$_.matches.groups[1].Value} | select-object -Last 1
+  }
+  
+  function Get-Last-Branch {
+    Find-Git-Dir | Join-Path -ChildPath ".git\logs\HEAD" | gci | Get-Content | Select-String -Pattern "checkout: moving from .+ to (.+)" | % {$_.matches.groups[1].Value}  | Get-Unique | select-object -last 2 | select-object -first 1
+  }
+  
+  function Git-Back {
+    iex "git checkout $(Get-Last-Branch)"
+  }
+  
+  function Weather {
+    (Invoke-WebRequest "http://wttr.in/Sydney" -UserAgent curl -UseBasicParsing).content
+  }
+  
+  function Moon {
+    (Invoke-WebRequest "http://wttr.in/Moon" -UserAgent curl -UseBasicParsing).content
+  }
