@@ -371,3 +371,12 @@ function Find-Git-Dir {
         [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
     }
 }
+
+function Good-Morning {
+    $statusfile = '~/.status'
+    if (!(Test-Path $statusfile) -or (Get-Item $statusfile).LastWriteTime -lt (Get-Date).Date) { 
+        touch $statusfile
+        Write-Host "Good morning."
+        Weather
+    }
+}
