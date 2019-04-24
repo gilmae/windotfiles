@@ -341,3 +341,33 @@ function Find-Git-Dir {
   function Moon {
     (Invoke-WebRequest "http://wttr.in/Moon" -UserAgent curl -UseBasicParsing).content
   }
+
+  function Timesheets {
+      open("https://fiori.interpublic.com/flp#Shell-home")
+  }
+
+
+  $projectsDirectory = 'c:\projects'
+  function Open-Project {
+    [CmdletBinding()]
+    Param(
+        $Project
+    )
+
+    
+
+    Set-Location $projectsDirectory
+
+    if ($project -ne $Null -and $project -ne "") {
+        Set-Location $project
+    }
+  }
+
+  Register-ArgumentCompleter -CommandName 'Open-Project' -ParameterName 'project' -ScriptBlock {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameter)
+
+    (Get-ChildItem -Path $projectsDirectory).Name | 
+        Where-Object {$_ -like "$wordToComplete*"} | ForEach-Object {
+        [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+    }
+}
