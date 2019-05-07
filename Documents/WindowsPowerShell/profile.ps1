@@ -16,14 +16,4 @@ if (Test-Path($ChocolateyProfile)) {
 
 Set-PSReadlineOption -BellStyle None
 
-$pshost = get-host
-$pswindow = $pshost.ui.rawui
-$newsize = $pswindow.buffersize
-$newsize.height = 3000
-$newsize.width = 150
-$pswindow.buffersize = $newsize
-$newsize = $pswindow.windowsize
-$newsize.height = 50
-$newsize.width = 150
-$pswindow.windowsize = $newsize
-
+$script:base_environment = Get-Environment

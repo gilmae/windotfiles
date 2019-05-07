@@ -302,13 +302,13 @@ function Open-Pr {
     $branch = Invoke-Expression("git rev-parse --abbrev-ref HEAD") 
 
     if ($origin.IndexOf("visualstudio.com") -gt -1) {
-        Start-Process "$origin/pullrequestcreate?sourceRef=$branch"
+        open "$origin/pullrequestcreate?sourceRef=$branch"
     }
     elseif ($origin.IndexOf("github.com" -gt -1)) {
-        Start-Process "$origin/compare/$branch)"
+        open "$origin/compare/$branch)"
     }
     elseif ($origin.IndexOf("bitbucket") -gt -1) {
-        Start-Process "$origin/pull-requests/new?source=$branch"
+        open "$origin/pull-requests/new?source=$branch"
     }
 }
 
@@ -354,12 +354,10 @@ function Find-Git-Dir {
         $Project
     )
 
-    
-
-    Set-Location $projectsDirectory
+    Set-Location-And-Env $projectsDirectory
 
     if ($project -ne $Null -and $project -ne "") {
-        Set-Location $project
+        Set-Location-And-Env $project
     }
   }
 
@@ -380,3 +378,47 @@ function Good-Morning {
         Weather
     }
 }
+
+function Set-Location-And-Env {
+    param($path)
+
+    Restore-Environment $script:base_environment
+    Set-Location $path
+    Set-Folder-Environment
+}
+
+function Set-Folder-Environment {
+    if (Test-Path -path ".fenv.ps1")
+    {
+        Invoke-Expression ".fenv.ps1"
+    }
+}
+
+# Returns the current environment.
+function Get-Environment {
+    get-childitem Env:
+  }
+  
+  # Restores the environment to a previous state.
+  function Restore-Environment {
+    param(
+      [parameter(Mandatory=$TRUE)]
+        [System.Collections.DictionaryEntry[]] $oldEnv
+    )
+    # Remove any added variables.
+    compare-object $oldEnv $(Get-Environment) -property Key -passthru |
+    where-object { $_.SideIndicator -eq "=>" } |
+    foreach-object { remove-item Env:$($_.Name) }
+    # Revert any changed variables to original values.
+    compare-object $oldEnv $(Get-Environment) -property Value -passthru |
+    where-object { $_.SideIndicator -eq "<=" } |
+    foreach-object { set-item Env:$($_.Name) $_.Value }
+  }
+
+  function Lint {
+      param(
+        [parameter(Mandatory=$TRUE)]
+        $solution
+      )
+      iex("inspectcode.exe $solution $env:LINT_ARGS")
+  }

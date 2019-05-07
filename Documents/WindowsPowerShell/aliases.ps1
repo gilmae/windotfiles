@@ -94,3 +94,8 @@ Set-Alias unmute Set-SoundUnmute
 Set-Alias update System-Update
 
 Set-Alias proj Open-Project
+
+del alias:cd -Force
+Set-Alias cd Set-Location-And-Env
+
+Set-Alias glb Get-Last-Branch
