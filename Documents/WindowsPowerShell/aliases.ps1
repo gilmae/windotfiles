@@ -14,23 +14,8 @@ ${function:docs} = { Set-Location ~\Documents }
 ${function:dl} = { Set-Location ~\Downloads }
 
 ${function:gs} = { iex "git status" }
-${function:proj} = { 
 
-    [CmdletBinding()]
-    Param( 
-        [string]$arg1 = "",
-        [string]$arg2 = ""
-    ) 
-
-    Set-Location c:\projects 
-    if ($arg1 -eq "new" -and $arg2 -ne ""){
-        CreateAndSet-Directory $arg2
-    }
-    elseif ($arg1 -ne "") {
-        Set-Location $arg1
-    }
-}
-function e {  & 'C:\Program Files (x86)\Notepad++\notepad++.exe' $args }
+Set-Alias e $env:EDITOR
 
 # Missing Bash aliases
 Set-Alias time Measure-Command
@@ -99,3 +84,7 @@ del alias:cd -Force
 Set-Alias cd Set-Location-And-Env
 
 Set-Alias glb Get-Last-Branch
+
+Set-Alias x explorer
+
+${function:oxd} = { explorer $pwd }
