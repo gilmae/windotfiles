@@ -420,5 +420,43 @@ function Get-Environment {
         [parameter(Mandatory=$TRUE)]
         $solution
       )
-      iex("inspectcode.exe $solution $env:LINT_ARGS")
+      iex("inspectcode.exe $env:LINT_ARGS $solution ")
+  }
+
+  function ipe {curl ipinfo.io/ip}
+  function ipi {ipconfig | Select-String -pattern "IPv4 Address[\.\s]+: ([\d\.]+)" | % {$_.matches.groups[1].Value} }
+
+
+  
+  function Check-For-Broken-CsProj-References {
+    <#
+    .SYNOPSIS
+       Scans for broken file includes in .csproj files
+    #>
+    $projects = Get-ChildItem -Path $basePath -Filter *.csproj -Recurse
+
+    foreach ($project in $projects.FullName) {
+        $root = Split-Path $project
+        $data = [xml](Get-Content $project)
+    
+        $paths = $data.Project.ItemGroup.Content.Include + $data.Project.ItemGroup.None.Include
+    
+        foreach ($file in $paths) {
+            $path = Join-Path -path $root -childpath $file
+            if ((Test-Path -path $path) -eq $False ) {
+                Write-Host "File found in csproj but missing from filesystem: " $path
+            }
+        }
+        
+        # $configs = Get-ChildItem -Path (Join-Path -path $root -childpath "unicorn") -Filter *.yml -Recurse
+        # Push-Location $root
+        # foreach ($config in $configs.FullName) {
+        # 	$pathToCheck = (Resolve-Path -relative $config).Replace(".\" , "")
+            
+        # 	if (($paths -contains $pathToCheck) -eq $False) {
+        # 		Write-Host "File missing from csproj: " $config
+        # 	}
+        # }
+        # Pop-Location
+    }
   }
