@@ -428,14 +428,14 @@ function Get-Environment {
 
 
   
-  function Check-For-Broken-CsProj-References {
+  function Check-Proj-References {
+      param(
+          [string]$project
+      )
     <#
     .SYNOPSIS
        Scans for broken file includes in .csproj files
     #>
-    $projects = Get-ChildItem -Path $basePath -Filter *.csproj -Recurse
-
-    foreach ($project in $projects.FullName) {
         $root = Split-Path $project
         $data = [xml](Get-Content $project)
     
@@ -448,15 +448,23 @@ function Get-Environment {
             }
         }
         
-        # $configs = Get-ChildItem -Path (Join-Path -path $root -childpath "unicorn") -Filter *.yml -Recurse
-        # Push-Location $root
-        # foreach ($config in $configs.FullName) {
-        # 	$pathToCheck = (Resolve-Path -relative $config).Replace(".\" , "")
+        $configs = Get-ChildItem -Path (Join-Path -path $root -childpath "unicorn") -Filter *.yml -Recurse
+        Push-Location $root
+        foreach ($config in $configs.FullName) {
+            $pathToCheck = (Resolve-Path -relative $config).Replace(".\" , "")
             
-        # 	if (($paths -contains $pathToCheck) -eq $False) {
-        # 		Write-Host "File missing from csproj: " $config
-        # 	}
-        # }
-        # Pop-Location
+            if (($paths -contains $pathToCheck) -eq $False) {
+         		Write-Host "File missing from csproj: " $config
+            }
+        }
+        Pop-Location
+    
+  }
+
+  function Check-Proj-References-All {
+    $projects = Get-ChildItem -Path $basePath -Filter *.csproj -Recurse
+
+    foreach ($project in $projects.FullName) {
+        Check-For-Broken-CsProj-References -project $project
     }
   }
