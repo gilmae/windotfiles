@@ -15,6 +15,9 @@ ${function:dl} = { Set-Location ~\Downloads }
 
 ${function:gs} = { iex "git status" }
 
+${function:generate-password} = {openssl rand -base64 32}
+${function:generate-alphanumeric-password} = {openssl rand -hex 16}
+
 Set-Alias e $env:EDITOR
 
 # Missing Bash aliases
