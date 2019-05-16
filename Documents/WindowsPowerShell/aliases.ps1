@@ -91,3 +91,5 @@ Set-Alias glb Get-Last-Branch
 Set-Alias x explorer
 
 ${function:oxd} = { explorer $pwd }
+
+${function:clip-email} = {Set-Clipboard ([adsi]"LDAP://$(whoami /fqdn)").mail}
