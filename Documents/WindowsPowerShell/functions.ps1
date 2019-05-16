@@ -354,10 +354,10 @@ function Find-Git-Dir {
         $Project
     )
 
-    Set-Location-And-Env $projectsDirectory
+    Set-Location $projectsDirectory
 
     if ($project -ne $Null -and $project -ne "") {
-        Set-Location-And-Env $project
+        Set-Location $project
     }
   }
 
@@ -379,18 +379,15 @@ function Good-Morning {
     }
 }
 
-function Set-Location-And-Env {
-    param($path)
-
-    Restore-Environment $script:base_environment
-    Set-Location $path
-    Set-Folder-Environment
-}
-
 function Set-Folder-Environment {
     if (Test-Path -path ".fenv.ps1")
     {
         Invoke-Expression ".fenv.ps1"
+    }
+
+    if (Test-Path -path ".fenv")
+    {
+        Get-Content ".fenv" | Invoke-Expression
     }
 }
 
