@@ -36,5 +36,16 @@ $script:base_environment = Get-Environment
 # Set a breakpoint on the pwd variable in order to check for the .fenv.ps1 files
 $null = Set-PSBreakpoint -Variable pwd -Action {
   Restore-Environment $script:base_environment
-  Set-Folder-Environment
+  $locations = @()
+  $loc = $pwd
+  do {
+	  $locations += $loc
+	  $loc = (Get-Item $loc).Parent.FullName
+  } while ($loc -ne $Null)
+
+  # make sure that children override parents by reversing the execution paths
+  [array]::Reverse($locations)
+  foreach ($location in $locations) {
+  	Set-Folder-Environment $location
+  }
 }

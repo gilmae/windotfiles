@@ -380,14 +380,13 @@ function Good-Morning {
 }
 
 function Set-Folder-Environment {
-    if (Test-Path -path ".fenv.ps1")
+	param(
+		[string] $path
+	)
+	$filepath = Join-Path -path $path -childpath ".fenv"
+    if (Test-Path -path $filepath)
     {
-        Invoke-Expression ".fenv.ps1"
-    }
-
-    if (Test-Path -path ".fenv")
-    {
-        Get-Content ".fenv" | Invoke-Expression
+		Get-Content $filepath | Invoke-Expression
     }
 }
 
