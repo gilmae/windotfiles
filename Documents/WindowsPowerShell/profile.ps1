@@ -16,4 +16,4 @@ if (Test-Path($ChocolateyProfile)) {
 
 Set-PSReadlineOption -BellStyle None
 
-$script:base_environment = Get-Environment
+
