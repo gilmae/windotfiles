@@ -465,3 +465,7 @@ function Get-Environment {
     }
   }
   
+  function Git-Prune-Merged-Branches {
+    $curBranch = $(git rev-parse --abbrev-ref HEAD)
+    git branch --merged | % { $_.substring(2) } | Where-Object {$_ -ne $curBranch} | % { iex("git branch -d $_") }
+  }
