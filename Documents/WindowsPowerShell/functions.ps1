@@ -414,9 +414,21 @@ function Get-Environment {
   function Lint {
       param(
         [parameter(Mandatory=$TRUE)]
-        $solution
+        $solution,
+
+        $open_log = $false
       )
-      iex("inspectcode.exe $env:LINT_ARGS $solution ")
+
+      $tempName = [System.IO.Path]::GetTempFileName()
+      
+      iex("inspectcode.exe $env:LINT_ARGS -o=$tempName $solution ") | Out-Null
+      
+      if ($open_log -eq $true){
+          open $tempName
+      }
+      else {
+        return $tempName
+      }
   }
 
   function ipe {curl ipinfo.io/ip}
@@ -468,4 +480,13 @@ function Get-Environment {
   function Git-Prune-Merged-Branches {
     $curBranch = $(git rev-parse --abbrev-ref HEAD)
     git branch --merged | % { $_.substring(2) } | Where-Object {$_ -ne $curBranch} | % { iex("git branch -d $_") }
+  }
+
+  function Kitty{
+    param(
+        [parameter(ValueFromPipeline)]
+        $path
+    )
+
+    Get-Content $path
   }
