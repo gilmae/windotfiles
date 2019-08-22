@@ -72,6 +72,9 @@
 	dloc = diff --shortstat
 	
 	url = "!git remote get-url"
+	
+	# Just add to the last commit
+	cane = commit --amend --no-edit
 [apply]
     # Detect whitespace errors when applying a patch
     whitespace = warn

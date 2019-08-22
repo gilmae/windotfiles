@@ -2,3 +2,5 @@ WindowsPowershell\Modules
 .lir
 .fenv.ps1
 .fenv
+
+MLP.*.pubxml
