@@ -416,13 +416,34 @@ function Get-Environment {
         [parameter(Mandatory=$TRUE)]
         $solution,
 
-        $open_log = $false
+        $open_log = $false,
+
+        [ValidateSet('Text','Html','Xml','brief')]
+        [string]$mode="Text"
       )
+
+      $format = If ($mode -eq 'brief') {"text"} Else {$mode}
 
       $tempName = [System.IO.Path]::GetTempFileName()
       
-      iex("inspectcode.exe $env:LINT_ARGS -o=$tempName $solution ") | Out-Null
+      Invoke-Expression("inspectcode.exe $env:LINT_ARGS -o=$tempName -f=$format $solution ") | Out-Null
       
+      if ($mode -eq  'brief') 
+      {
+        # InspectCode spits out a line at the beginning with it's own name and the name of the solution. 
+        # But if we want to use this in a git hook, say, it's easier to get rid of it.
+        (Get-Content $tempName | Select-Object -Skip 1) | Set-Content "$tempName.tmp"
+        
+        # If slicing off the first line meant that there was no content, Set-Content won't create the tmp tmp file
+        # But Touch will!
+        if ((Test-Path "$tempName.tmp") -eq $False) 
+        {
+            Touch "$tempName.tmp"
+        }
+
+        Move-Item "$tempName.tmp" $tempName -Force
+      }
+
       if ($open_log -eq $true){
           open $tempName
       }
@@ -478,15 +499,35 @@ function Get-Environment {
   }
   
   function Git-Prune-Merged-Branches {
-    $curBranch = $(git rev-parse --abbrev-ref HEAD)
-    git branch --merged | % { $_.substring(2) } | Where-Object {$_ -ne $curBranch} | % { iex("git branch -d $_") }
+    Get-Merged-Branches | % {iex("git branch -d $_")}
   }
 
-  function Kitty{
+  function kit{
     param(
         [parameter(ValueFromPipeline)]
-        $path
+        $Path
     )
 
-    Get-Content $path
+    Get-Content $Path
+  }
+
+  function Normalise-Branch-Name
+  {
+    param(
+        [parameter(ValueFromPipeline)]
+        [array]$branch
+    )
+
+    $branch | % {$_.substring(2)}
+  }
+
+  function Get-Other-Branches {
+    $curBranch = Get-Current-Branch
+    return , $(git branch  | Where-Object {$_ -notmatch $curBranch})
+    
+  }
+
+  function Get-Merged-Branches {
+    $curBranch = Get-Current-Branch
+    return , $(git branch --merged  | Where-Object {$_ -notmatch $curBranch})
   }
