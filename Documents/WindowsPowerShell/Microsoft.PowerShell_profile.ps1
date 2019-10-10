@@ -30,7 +30,10 @@ $newsize.height = 50
 $newsize.width = 150
 $pswindow.windowsize = $newsize
 
-Good-Morning
+if ($env:TERM_PROGRAM -eq "") {
+  Good-Morning
+}
+
 $script:base_environment = Get-Environment
 
 # Set a breakpoint on the pwd variable in order to check for the .fenv.ps1 files

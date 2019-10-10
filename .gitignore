@@ -4,3 +4,4 @@ WindowsPowershell\Modules
 .fenv
 
 MLP.*.pubxml
+unidiff.ps1

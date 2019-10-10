@@ -154,3 +154,5 @@
     trustExitCode = false
 [gc]
 	auto = 256
+[mergetool]
+	keepBackup = false
