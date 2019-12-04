@@ -9,6 +9,7 @@ function dotfile {git --git-dir=$HOME\.dotfiles\ --work-tree=$HOME $args}
 
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+$EDITOR = $env:EDITOR
 
 if (Test-Path($ChocolateyProfile)) {
   Import-Module "$ChocolateyProfile"
