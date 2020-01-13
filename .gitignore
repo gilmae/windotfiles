@@ -5,3 +5,6 @@ WindowsPowershell\Modules
 
 MLP.*.pubxml
 unidiff.ps1
+package-lock.json
+
+nuget.config
