@@ -115,10 +115,6 @@
     changed = green
     untracked = cyan
     branch = magenta
-[merge]
-    # Include summaries of merged commits in newly created merge commit messages
-    log = true
-	tool = kdiff3
 
 # URL shorthands
 [url "git@github.com:"]
@@ -150,9 +146,15 @@
 [difftool]
     prompt = false
 [difftool "vscode"]
-    cmd = \"C:\\Users\\david.edgar\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\code.cmd\" \"$LOCAL\" \"$REMOTE\" --diff --wait
+    cmd = code --wait --diff $LOCAL $REMOTE
     trustExitCode = false
+[merge]
+    # Include summaries of merged commits in newly created merge commit messages
+    log = true
+	tool = vscode
+[mergetool "vscode"]
+    cmd = code --wait $MERGED
+	keepBackup = false
 [gc]
 	auto = 256
-[mergetool]
-	keepBackup = false
+
